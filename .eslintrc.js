@@ -6,7 +6,8 @@ module.exports = {
         "sourceType": "module" //es6 import
     },
     "globals": {
-        "fetch": false //浏览器的全局变量
+        "fetch": false,
+        "define": false
     },
     "rules": {
         "no-unreachable": 2,
