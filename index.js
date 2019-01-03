@@ -1,4 +1,4 @@
-const ttiPolyfill = require('tti-polyfill')
+import ttiPolyfill from './lib/tti-polyfill.js'
 
 const arrangeFuncMap = new Map()
 arrangeFuncMap.set('resource', entry => {
@@ -37,15 +37,14 @@ class PerformanceMonitor {
         this.monitorResult = {}
     }
     uploadMonitorLogs () {
-        // navigator.sendBeacon()
         if (navigator.sendBeacon && typeof navigator.sendBeacon === 'function') {
             const headers = {
                 type: 'application/json'
             }
             const blob = new window.Blob([JSON.stringify(this.monitorResult)], headers)
-            navigator.sendBeacon('url', blob)
+            navigator.sendBeacon(this.options.url, blob)
         } else if (fetch in window) {
-            window.fetch('url', {
+            window.fetch(this.options.url, {
                 method: 'POST',
                 body: JSON.stringify(this.monitorResult)
             })
@@ -63,14 +62,16 @@ class PerformanceMonitor {
                         ? this.monitorResult[entry.entryType].push(arrangeFuncMap.get(entry.entryType)(entry))
                         : this.monitorResult[entry.entryType] = [arrangeFuncMap.get(entry.entryType)(entry)]
                 })
-            observer.disconnect()
+            this.monitorResult.resource && this.monitorResult.resource.sort((a, b) => {
+                return b.duration - a.duration
+            })
+            // observer.disconnect()
         })
         observer.observe({
-            entryTypes: ['resource', 'mark', 'paint', 'navigation', 'longtask'],
-            buffered: true
+            entryTypes: ['resource', 'mark', 'paint', 'navigation', 'longtask']
         })
         ttiPolyfill.getFirstConsistentlyInteractive({}).then((tti) => {
-            this.monitorResult['navigation'].push({
+            this.monitorResult['navigation'] && this.monitorResult['navigation'].push({
                 name: 'time-to-interactive',
                 startTime: tti
             })
@@ -84,18 +85,20 @@ class PerformanceMonitor {
             }
             // 尽量不影响页面主线程
             if (window.requestIdleCallback) {
-                window.requestIdleCallback(this.uploadMonitorLogs)
+                window.requestIdleCallback(this.uploadMonitorLogs.bind(this))
             } else {
-                setTimeout(this.uploadMonitorLogs)
+                setTimeout(this.uploadMonitorLogs.bind(this))
             }
         }
     }
 }
 
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = PerformanceMonitor
-} else if (typeof define === 'function' && define.amd) {
-    define('PerformanceMonitor', [], () => PerformanceMonitor)
-} else {
-    window.PerformanceMonitor = PerformanceMonitor
-}
+// if (typeof module !== 'undefined' && module.exports) {
+//     module.exports = PerformanceMonitor
+// } else if (typeof define === 'function' && define.amd) {
+//     define('PerformanceMonitor', [], () => PerformanceMonitor)
+// } else {
+//     window.PerformanceMonitor = PerformanceMonitor
+// }
+
+export default PerformanceMonitor
