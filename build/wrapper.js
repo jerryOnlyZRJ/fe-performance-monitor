@@ -1,7 +1,7 @@
 /*eslint-disable*/
 (function (root, factory) {
   if (typeof module === 'undefined') {
-    root.mtEvents = factory()
+    root.PerformanceMonitor = factory()
   } else {
     module.exports = factory()
   }

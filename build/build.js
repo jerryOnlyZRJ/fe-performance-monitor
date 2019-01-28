@@ -1,5 +1,10 @@
 const rollup = require('rollup')
 const buble = require('rollup-plugin-buble')
+// 将编译过的代码转化为ES6 Module的格式，解决`'default' is not exported`问题
+const commonjs = require('rollup-plugin-commonjs')
+// 打包通过npm安装的依赖
+// 特别注意，不需要打包的依赖一定要在inputOptions中添加external和ouputOptions中的globals
+const resolve = require('rollup-plugin-node-resolve')
 const uglify = require('uglify-js')
 const gzipSize = require('gzip-size')
 const chalk = require('chalk')
@@ -19,13 +24,15 @@ const comment = `/**
 
 const options = {
   format: 'iife',
-  name: pkg.name.replace(/-(\w)/g, (match, $1) => $1.toLocaleUpperCase())
+  name: pkg.name.replace(/-(\w)/g, (match, $1) => $1.toLocaleUpperCase()),
 }
 
 async function build() {
   const bundle = await rollup.rollup({
     input: path.join(cwd, pkg.main),
     plugins: [
+      commonjs(),
+      resolve(),
       buble()
     ]
   })
