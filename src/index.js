@@ -1,5 +1,5 @@
 import ttiPolyfill from 'tti-polyfill'
-import arrangeFuncMap from './arrangeFuncMap.js'
+import arrangeFuncMap from './lib/arrangeFuncMap.js'
 
 class PerformanceMonitor {
     constructor (options) {
