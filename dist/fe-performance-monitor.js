@@ -1,7 +1,7 @@
 /**
  * fe-performance-monitor v1.0.0
  * Copyright 2018-2019 Ranjay
- * Released under the MIT License
+ * Released under the Apache License
  * https://github.com/jerryOnlyZRJ/fe-performance-monitor#readme
  */
 /*eslint-disable*/
@@ -105,20 +105,20 @@
     _createClass(PerformanceMonitor, [{
       key: "uploadMonitorLogs",
       value: function uploadMonitorLogs() {
-        // if (navigator.sendBeacon && typeof navigator.sendBeacon === 'function') {
-        //   var headers = {
-        //     type: 'application/json'
-        //   };
-        //   var blob = new window.Blob([JSON.stringify(this.monitorResult)], headers);
-        //   navigator.sendBeacon(this.options.url, blob);
-        // } else if (fetch in window) {
-        //   window.fetch(this.options.url, {
-        //     method: 'POST',
-        //     body: JSON.stringify(this.monitorResult)
-        //   });
-        // } else {
+        if (navigator.sendBeacon && typeof navigator.sendBeacon === 'function') {
+          var headers = {
+            type: 'application/json'
+          };
+          var blob = new window.Blob([JSON.stringify(this.monitorResult)], headers);
+          navigator.sendBeacon(this.options.url, blob);
+        } else if (fetch in window) {
+          window.fetch(this.options.url, {
+            method: 'POST',
+            body: JSON.stringify(this.monitorResult)
+          });
+        } else {
           console.log(this.monitorResult);
-        // }
+        }
       }
     }, {
       key: "init",

@@ -18,7 +18,6 @@ const jsDocRegExp = /\/\*\*([\w\W]*?)\*\//g
 // iife or umd
 const argv = require('yargs-parser')(process.argv.slice(2))
 const outputFormat = argv.format || 'iife'
-console.log(outputFormat)
 
 const comment = `/**
  * ${pkg.name} v${pkg.version}
@@ -32,7 +31,7 @@ const options = {
     name: pkg.name.replace(/-(\w)/g, (match, $1) => $1.toLocaleUpperCase())
 }
 
-function generateDistFiles (developmentCode, productionCode) {
+function generateDistFiles(developmentCode, productionCode) {
     if (!fs.existsSync(path.join(cwd, 'dist'))) {
         fs.mkdirSync(path.join(cwd, 'dist'))
     }
@@ -47,9 +46,9 @@ function generateDistFiles (developmentCode, productionCode) {
     console.log(chalk.green(`${pkg.name} production (gzipped) -> `) + chalk.bold(gzipSize.sync(productionCode) / 1000 + 'kb'))
 }
 
-async function build () {
+async function build() {
     const bundle = await rollup.rollup({
-        input: path.join(cwd, pkg.main),
+        input: outputFormat === 'iife' ? path.join(cwd, pkg.main) : path.join(cwd, 'build/umd-wrapper.js'),
         plugins: [
             babel({
                 exclude: /node_modules/
@@ -64,7 +63,9 @@ async function build () {
     // remove jsdoc
     code = code.replace(jsDocRegExp, '')
 
-    code = fs.readFileSync(path.join(cwd, 'build/iife-wrapper.js')).toString().replace('INSERT', code.split('\n').slice(1, -3).join('\n')).replace("'use strict'", '"use strict"')
+    if (outputFormat === 'iife') {
+        code = fs.readFileSync(path.join(cwd, 'build/iife-wrapper.js')).toString().replace('INSERT', code.split('\n').slice(1, -3).join('\n')).replace("'use strict'", '"use strict"')
+    }
     const developmentCode = comment + code.replace(ENV_RE, '"development"')
     const productionCode = comment + uglify.minify(code.replace(ENV_RE, '"production"')).code
 
