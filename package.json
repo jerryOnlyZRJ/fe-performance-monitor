@@ -5,15 +5,16 @@
   "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint *.js --fix",
-    "build": "node build/build.js"
+    "lint": "eslint src/**/*.js build/*.js --fix",
+    "build": "node build/build.js",
+    "build:umd": "node build/build.js --format umd"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/jerryOnlyZRJ/fe-performance-monitor.git"
   },
   "keywords": [],
-  "author": "",
+  "author": "Ranjay",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/jerryOnlyZRJ/fe-performance-monitor/issues"
@@ -23,6 +24,9 @@
     "tti-polyfill": "^0.2.2"
   },
   "devDependencies": {
+    "@babel/core": "^7.2.2",
+    "@babel/plugin-transform-runtime": "^7.2.0",
+    "@babel/preset-env": "^7.3.1",
     "babel-eslint": "^10.0.1",
     "chalk": "^2.4.2",
     "eslint": "^5.11.1",
@@ -33,9 +37,10 @@
     "eslint-plugin-standard": "^4.0.0",
     "gzip-size": "^5.0.0",
     "rollup": "^1.1.2",
-    "rollup-plugin-buble": "^0.19.6",
+    "rollup-plugin-babel": "^4.3.2",
     "rollup-plugin-commonjs": "^9.2.0",
     "rollup-plugin-node-resolve": "^4.0.0",
-    "uglify-js": "^3.4.9"
+    "uglify-js": "^3.4.9",
+    "yargs-parser": "^11.1.1"
   }
 }
