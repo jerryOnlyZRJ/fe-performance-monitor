@@ -95,7 +95,9 @@
   var PerformanceMonitor =
   /*#__PURE__*/
   function () {
-    function PerformanceMonitor(options) {
+    function PerformanceMonitor() {
+      var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
       _classCallCheck(this, PerformanceMonitor);
 
       this.options = options;
@@ -105,19 +107,27 @@
     _createClass(PerformanceMonitor, [{
       key: "uploadMonitorLogs",
       value: function uploadMonitorLogs() {
-        if (navigator.sendBeacon && typeof navigator.sendBeacon === 'function') {
-          var headers = {
-            type: 'application/json'
-          };
-          var blob = new window.Blob([JSON.stringify(this.monitorResult)], headers);
-          navigator.sendBeacon(this.options.url, blob);
-        } else if (fetch in window) {
-          window.fetch(this.options.url, {
-            method: 'POST',
-            body: JSON.stringify(this.monitorResult)
-          });
+        if (this.options.url) {
+          if (navigator.sendBeacon && typeof navigator.sendBeacon === 'function') {
+            var headers = {
+              type: 'application/json'
+            };
+            var blob = new window.Blob([JSON.stringify(this.monitorResult)], headers);
+            navigator.sendBeacon(this.options.url, blob);
+          } else if ('fetch' in window) {
+            window.fetch(this.options.url, {
+              method: 'POST',
+              body: JSON.stringify(this.monitorResult)
+            });
+          } else if ('XMLHttpRequest' in window && typeof window.XMLHttpRequest === 'function') {
+            var xhr = new window.XMLHttpRequest();
+            xhr.open('POST', this.options.url);
+            xhr.send(JSON.stringify(this.monitorResult));
+          }
         } else {
-          console.log(this.monitorResult);
+          if (window.localStorage) {
+            window.localStorage.setItem('performanceLog', JSON.stringify(this.monitorResult));
+          }
         }
       }
     }, {
